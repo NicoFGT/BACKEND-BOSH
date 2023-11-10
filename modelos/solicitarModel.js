@@ -1,20 +1,22 @@
-var usuariosModel = {}
+var solicitarModel = {}
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
-var usuariosSchema = new Schema ({
+var solicitarSchema = new Schema ({
     
     nombres:String,
     apellidos:String,
     rol:Number,
     identificacion:String,
     correo:String,
-    password:String,
-    password2:String
+    direccion:String,
+    telefono:Number,
+    ingresos:Number,
+    
 })
 
-const MyModel = mongoose.model("usuarios", usuariosSchema)
+const MyModel = mongoose.model("solicitar", solicitarSchema)
 
-usuariosModel.validarIdentificacion = function(post,callback){
+solicitarModel.validarIdentificacion = function(post,callback){
     MyModel.find({identificacion:post.identificacion},{},(error, documentos) => {
         if (error) {
             return callback ({state:false})
@@ -31,7 +33,7 @@ usuariosModel.validarIdentificacion = function(post,callback){
     })
 }
 
-usuariosModel.validarcorreo = function(post,callback){
+solicitarModel.validarcorreo = function(post,callback){
     MyModel.find({correo:post.correo},{},(error, documentos) => {
         if (error) {
             return callback ({state:false})
@@ -48,7 +50,7 @@ usuariosModel.validarcorreo = function(post,callback){
     })
 }
 
-usuariosModel.guardar = function(post,callback){
+solicitarModel.guardar = function(post,callback){
 
     const instancia = new MyModel
     instancia.identificacion = post.identificacion 
@@ -56,8 +58,9 @@ usuariosModel.guardar = function(post,callback){
     instancia.rol = 2
     instancia.apellidos = post.apellidos
     instancia.correo = post.correo
-    instancia.password = post.password
-    instancia.password2 = post.password2
+    instancia.direccion = post.direccion
+    instancia.telefono = post.telefono
+    instancia.ingresos = post.ingresos
 
     instancia.save((error, creado)=>{
         if (error) {
@@ -65,13 +68,13 @@ usuariosModel.guardar = function(post,callback){
            return callback({state:false}) 
         }
         else{
-            return callback({state:true,mensaje:"Usuario guardado"})
+            return callback({state:true,mensaje:"Tu tarjeta Bosh esta en camino"})
         }
     })
 
 }
 
-usuariosModel.cargardatos = function(post,callback){
+solicitarModel.cargardatos = function(post,callback){
     MyModel.find({},(error,documentos) => {
         if (error) {
             return callback({state:false,documentos:[],error:error})
@@ -82,13 +85,16 @@ usuariosModel.cargardatos = function(post,callback){
     })
 }
 
-usuariosModel.actualizar = function(post,callback){
+solicitarModel.actualizar = function(post,callback){
 
     MyModel.findOneAndUpdate({identificacion:post.identificacion},{
         identificacion:post.identificacion,
         nombres:post.nombres,
         apellidos:post.apellidos,
-        password:post.password
+        correo:post.correo,
+        direccion:post.direccion,
+        telefono:post.telefono,
+        ingresos:post.ingresos
     },(error,modificacion) => {
         if (error) {
             return callback({state:false,mensaje:"se presento un error al actualizar",error:error})
@@ -99,7 +105,7 @@ usuariosModel.actualizar = function(post,callback){
     })
 }
 
-usuariosModel.eliminar = function(post,callback){
+solicitarModel.eliminar = function(post,callback){
 
     MyModel.findOneAndDelete({identificacion:post.identificacion},(error,eliminacion) => {
         if (error) {
@@ -111,7 +117,7 @@ usuariosModel.eliminar = function(post,callback){
     })
 }
 
-usuariosModel.login = function(post,callback){
+solicitarModel.login = function(post,callback){
     MyModel.find({correo:post.correo,password:post.password},{password: 0},(error,documentos) => {
         if (error) {
             return callback({state:false,documentos:[],error:error})
@@ -123,4 +129,4 @@ usuariosModel.login = function(post,callback){
 }
 
 
-module.exports.usuariosModel = usuariosModel
+module.exports.solicitarModel = solicitarModel

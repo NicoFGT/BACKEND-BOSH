@@ -1,17 +1,20 @@
 const { response } = require('express')
 
-var usuariosModel = require('../modelos/usuariosModel.js').usuariosModel
-var usuariosController = {}
+var solicitarModel = require('../modelos/solicitarModel.js').solicitarModel
+var solicitarController = {}
 
-usuariosController.guardar = function(request,response){
+solicitarController.guardar = function(request,response){
 
     var post = {
         nombres:request.body.nombres,
         apellidos:request.body.apellidos,
         identificacion:request.body.identificacion,
         correo:request.body.correo,
-        password:request.body.password,
-        password2:request.body.password2,
+        direccion:request.body.direccion,
+        telefono:request.body.telefono,
+        ingresos:request.body.ingresos,
+
+        
     }
 
     if(post.nombres == undefined || post.nombres == null || post.nombres == ""){
@@ -34,26 +37,47 @@ usuariosController.guardar = function(request,response){
         return false
     }
 
-    if (/^(?=.*\d)(?=.*[a-z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/ .test(post.password) ==false) {
-        response.json({state:false,mensaje:"El password debe contener al menos una minúscula, mayúscula, número y un carácter especial. Y 8 carácteres como mínimo"})
-        return false
-    }
-    if (/^(?=.*\d)(?=.*[a-z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/ .test(post.password2) ==false) {
-        response.json({state:false,mensaje:"Las contraseñas deben coincidir"})
+    if (post.direccion == undefined || post.direccion == null || post.direccion == "") {
+        response.json({state:false,mensaje:"el campo direccion  es obligatorio"})
         return false
     }
 
-    if (post.password != post.password2) {
-        response.json({state:false,mensaje:"Las contraseñas deben coincidir"})
+    if(post.telefono == undefined || post.telefono == null){
+        response.json({state:false,mensaje:"el campo telefono es obligatorio"})
         return false
     }
-    else{
-        if (post.password != post.password2) {
-            response.json({state:true,mensaje:"Las contraseñas deben coincidir"})
+
+    if(post.telefono.length != 0){
+        if(Number.isInteger(parseInt(post.telefono)) == false){
+            response.json({state:false,mensaje:"el campo telefono debe ser numerico"})
+            return false
+        }
+        else{
+        
+              if(post.telefono.length != 10){
+                 response.json({state:false,mensaje:"el campo telefono debe tener 10 digitos"})
+                 return false
+                }
+        }
+    }
+
+    if(post.ingresos == undefined || post.ingresos == null || post.ingresos == ""){
+        response.json({state:false,mensaje:"el campo ingresos es obligatorio"})
+        return false
+    }
+    
+    if(post.ingresos.length > 0){
+        if(Number.isInteger(parseInt(post.ingresos)) == false){
+            response.json({state:false,mensaje:"el campo ingresos debe ser numerico"})
             return false
         }
     }
 
+
+
+
+
+
     
     
     
@@ -61,7 +85,7 @@ usuariosController.guardar = function(request,response){
 
 
     
-    usuariosModel.validarIdentificacion(post,function(res) {
+    solicitarModel.validarIdentificacion(post,function(res) {
         if (res.state == false) {
             response.json({state:false,mensaje:"Error al consultar en la base de datos"})
             return false
@@ -70,7 +94,7 @@ usuariosController.guardar = function(request,response){
 
         if(res.continuar == true){
             //guardar
-            usuariosModel.guardar(post,function(respuesta){
+            solicitarModel.guardar(post,function(respuesta){
                 response.json(respuesta)
             })
         }
@@ -81,20 +105,23 @@ usuariosController.guardar = function(request,response){
     })
 }
 
-usuariosController.cargardatos = function(request,response){
-    usuariosModel.cargardatos(null,function(respuesta){
+solicitarController.cargardatos = function(request,response){
+    solicitarModel.cargardatos(null,function(respuesta){
         response.json(respuesta)
 
     })
 }
 
-usuariosController.actualizar = function(request,response){
+solicitarController.actualizar = function(request,response){
     var post = {
-        identificacion:request.body.identificacion,
         nombres:request.body.nombres,
         apellidos:request.body.apellidos,
+        identificacion:request.body.identificacion,
         correo:request.body.correo,
-        password:request.body.password,
+        direccion:request.body.direccion,
+        telefono:request.body.telefono,
+        ingresos:request.body.ingresos,
+        
         
 
     }
@@ -119,16 +146,48 @@ usuariosController.actualizar = function(request,response){
         return false
     }
 
-    if (/^(?=.*\d)(?=.*[a-z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/ .test(post.password) ==false) {
-        response.json({state:false,mensaje:"El password debe contener al menos una minúscula, mayúscula, número y un carácter especial. Y 8 carácteres como mínimo"})
+    if (post.direccion == undefined || post.direccion == null || post.direccion == "") {
+        response.json({state:false,mensaje:"el campo direccion  es obligatorio"})
         return false
-
     }
 
-    usuariosModel.validarIdentificacion(post,function(existe){
+    if(post.telefono == undefined || post.telefono == null){
+        response.json({state:false,mensaje:"el campo telefono es obligatorio"})
+        return false
+    }
+
+    if(post.telefono.length != 0){
+        if(Number.isInteger(parseInt(post.telefono)) == false){
+            response.json({state:false,mensaje:"el campo telefono debe ser numerico"})
+            return false
+        }
+        else{
+        
+              if(post.telefono.length != 10){
+                 response.json({state:false,mensaje:"el campo telefono debe tener 10 digitos"})
+                 return false
+                }
+        }
+    }
+
+    if(post.ingresos == undefined || post.ingresos == null || post.ingresos == ""){
+        response.json({state:false,mensaje:"el campo ingresos es obligatorio"})
+        return false
+    }
+    
+    if(post.ingresos.length > 0){
+        if(Number.isInteger(parseInt(post.ingresos)) == false){
+            response.json({state:false,mensaje:"el campo ingresos debe ser numerico"})
+            return false
+        }
+    }
+
+    
+
+    solicitarModel.validarIdentificacion(post,function(existe){
         if(existe.continuar == false){
             //eliminar
-            usuariosModel.actualizar(post,function(respuesta){
+            solicitarModel.actualizar(post,function(respuesta){
                 response.json(respuesta)
             })
         }
@@ -138,7 +197,7 @@ usuariosController.actualizar = function(request,response){
     })
 }
 
-usuariosController.eliminar = function(request,response){
+solicitarController.eliminar = function(request,response){
     var post ={
         identificacion:request.body.identificacion,
     }
@@ -150,10 +209,10 @@ usuariosController.eliminar = function(request,response){
     
 
 
-    usuariosModel.validarIdentificacion(post,function(existe){
+    solicitarModel.validarIdentificacion(post,function(existe){
         if(existe.continuar == false){
             //eliminar
-            usuariosModel.eliminar(post,function(respuesta){
+            solicitarModel.eliminar(post,function(respuesta){
                 response.json(respuesta)
             })
         }
@@ -163,7 +222,7 @@ usuariosController.eliminar = function(request,response){
     })
 }
 
-usuariosController.login = function(request,response){
+solicitarController.login = function(request,response){
 
     var post = {
         correo:request.body.correo,
@@ -191,7 +250,7 @@ usuariosController.login = function(request,response){
 
    
     
-    usuariosModel.validarcorreo(post,function(res) {
+    solicitarModel.validarcorreo(post,function(res) {
         if (res.state == false) {
             response.json({state:false,mensaje:"Error al consultar en la base de datos"})
             return false
@@ -199,7 +258,7 @@ usuariosController.login = function(request,response){
 
 
         if(res.continuar == false){
-            usuariosModel.login(post, function(respuesta){
+            solicitarModel.login(post, function(respuesta){
                 if (respuesta.documentos.length > 0) {
                     console.log(respuesta.documentos)
                 request.session.identificacion = respuesta.documentos[0].identificacion
@@ -219,4 +278,4 @@ usuariosController.login = function(request,response){
         }
     })
 }
-module.exports.usuariosController = usuariosController
+module.exports.solicitarController = solicitarController

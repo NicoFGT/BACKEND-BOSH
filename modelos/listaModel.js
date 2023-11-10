@@ -1,20 +1,21 @@
-var usuariosModel = {}
+var listaModel = {}
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
-var usuariosSchema = new Schema ({
+var listaSchema = new Schema ({
     
     nombres:String,
     apellidos:String,
-    rol:Number,
     identificacion:String,
+    direccion:String,
+    telefono:Number,
+    ingresos:Number,
     correo:String,
-    password:String,
-    password2:String
+    
 })
 
-const MyModel = mongoose.model("usuarios", usuariosSchema)
+const MyModel = mongoose.model("lista", listaSchema)
 
-usuariosModel.validarIdentificacion = function(post,callback){
+listaModel.validarIdentificacion = function(post,callback){
     MyModel.find({identificacion:post.identificacion},{},(error, documentos) => {
         if (error) {
             return callback ({state:false})
@@ -31,34 +32,17 @@ usuariosModel.validarIdentificacion = function(post,callback){
     })
 }
 
-usuariosModel.validarcorreo = function(post,callback){
-    MyModel.find({correo:post.correo},{},(error, documentos) => {
-        if (error) {
-            return callback ({state:false})
-        }
-        else{
-            console.log(documentos)
-            if (documentos.length == 0) {
-                return callback({continuar:true})
-            }
-            else{
-                return callback({continuar:false}) 
-            }
-        }
-    })
-}
-
-usuariosModel.guardar = function(post,callback){
+listaModel.guardar = function(post,callback){
 
     const instancia = new MyModel
     instancia.identificacion = post.identificacion 
     instancia.nombres = post.nombres
-    instancia.rol = 2
     instancia.apellidos = post.apellidos
+    instancia.direccion = post.direccion
+    instancia.telefono = post.telefono
+    instancia.ingresos = post.ingresos
     instancia.correo = post.correo
-    instancia.password = post.password
-    instancia.password2 = post.password2
-
+    
     instancia.save((error, creado)=>{
         if (error) {
            console.log(error)
@@ -71,7 +55,7 @@ usuariosModel.guardar = function(post,callback){
 
 }
 
-usuariosModel.cargardatos = function(post,callback){
+listaModel.cargardatos = function(post,callback){
     MyModel.find({},(error,documentos) => {
         if (error) {
             return callback({state:false,documentos:[],error:error})
@@ -82,12 +66,37 @@ usuariosModel.cargardatos = function(post,callback){
     })
 }
 
-usuariosModel.actualizar = function(post,callback){
+listaModel.cargaridentificacion = function(post,callback){
+    MyModel.find({identificacion:post.identificacion},(error,documentos) => {
+        if (error) {
+            return callback({state:false,documentos:[],error:error})
+        }
+        else{
+            return callback({state:true,documentos:documentos})
+        }
+    })
+}
+
+listaModel.cargarid = function(post,callback){
+    MyModel.find({_id:post.id},(error,documentos) => {
+        if (error) {
+            return callback({state:false,documentos:[],error:error})
+        }
+        else{
+            return callback({state:true,documentos:documentos})
+        }
+    })
+}
+
+listaModel.actualizar = function(post,callback){
 
     MyModel.findOneAndUpdate({identificacion:post.identificacion},{
         identificacion:post.identificacion,
         nombres:post.nombres,
         apellidos:post.apellidos,
+        direccion:post.direccion,
+        telefono:post.telefono,
+        ingresos:post.ingresos,
         password:post.password
     },(error,modificacion) => {
         if (error) {
@@ -99,7 +108,7 @@ usuariosModel.actualizar = function(post,callback){
     })
 }
 
-usuariosModel.eliminar = function(post,callback){
+listaModel.eliminar = function(post,callback){
 
     MyModel.findOneAndDelete({identificacion:post.identificacion},(error,eliminacion) => {
         if (error) {
@@ -111,16 +120,5 @@ usuariosModel.eliminar = function(post,callback){
     })
 }
 
-usuariosModel.login = function(post,callback){
-    MyModel.find({correo:post.correo,password:post.password},{password: 0},(error,documentos) => {
-        if (error) {
-            return callback({state:false,documentos:[],error:error})
-        }
-        else{
-            return callback({state:true,documentos:documentos})
-        }
-    })
-}
 
-
-module.exports.usuariosModel = usuariosModel
+module.exports.listaModel = listaModel
